@@ -2,8 +2,9 @@
 using System.IO;
 using System.Linq;
 using DemoCheck.Analyzer;
-using VolvoWrench.Demo_Stuff;
-using VolvoWrench.Demo_Stuff.GoldSource;
+using DemoParser.Demo_stuff;
+using DemoParser.Demo_stuff.GoldSource;
+
 
 namespace DemoCheck
 {
@@ -59,17 +60,19 @@ namespace DemoCheck
                 return;
             }
 
-            Console.WriteLine($"MapName: {CurrentDemoFile.HlsooeDemoInfo.Header.MapName}");
+            Console.WriteLine($"MapName: {CurrentDemoFile.GsDemoInfo.Header.MapName}");
 
             var dir_entries_count = CurrentDemoFile.GsDemoInfo.DirectoryEntries.Count;
             for(int entry = 0; entry < dir_entries_count; entry++)
             {
                 var frame_count = CurrentDemoFile.GsDemoInfo.DirectoryEntries[entry].Frames.Count;
-                
-                for(var frame_index = 0; frame_index < frame_count; frame_index++)
+                var frame_keys = CurrentDemoFile.GsDemoInfo.DirectoryEntries[entry].Frames.Keys.ToArray();
+
+
+                for (var frame_index = 0; frame_index < frame_count; frame_index++)
                 {
-                    GoldSource.DemoFrame dem_frame = new GoldSource.DemoFrame();
-                    
+                    var dem_frame = frame_keys[frame_index];
+
                     var frame = CurrentDemoFile.GsDemoInfo.DirectoryEntries[entry].Frames[dem_frame];
 
                     // Start proceed this frame
