@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\VolvoWrench\VolvoWrench\VolvoWrench.csproj" />
+    <ProjectReference Include="..\DemoParser\DemoParser.csproj" />
   </ItemGroup>
 
 </Project>

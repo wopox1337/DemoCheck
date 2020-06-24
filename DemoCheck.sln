@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoCheck", "DemoCheck\Demo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VolvoWrench", "VolvoWrench\VolvoWrench\VolvoWrench.csproj", "{D594A1D6-30A7-48EC-9298-37BC21142F1D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DemoParser", "DemoParser\DemoParser.csproj", "{C4252800-3895-4BC8-B288-E1259793FA75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D594A1D6-30A7-48EC-9298-37BC21142F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D594A1D6-30A7-48EC-9298-37BC21142F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D594A1D6-30A7-48EC-9298-37BC21142F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4252800-3895-4BC8-B288-E1259793FA75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4252800-3895-4BC8-B288-E1259793FA75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4252800-3895-4BC8-B288-E1259793FA75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4252800-3895-4BC8-B288-E1259793FA75}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
