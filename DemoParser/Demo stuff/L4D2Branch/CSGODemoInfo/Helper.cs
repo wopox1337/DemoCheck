@@ -3,10 +3,16 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using DemoParser.Demo_stuff.L4D2Branch.CSGODemoInfo.DP;
+using DemoParser.Demo_stuff.L4D2Branch.CSGODemoInfo.DT;
 
-namespace DemoParser.Demo_stuff
+#if SLOW_PROTOBUF
+using ProtoBuf;
+#endif
+
+namespace DemoParser.Demo_stuff.L4D2Branch.CSGODemoInfo
 {
-    internal static class BinaryReaderExtension
+    internal static class Helper
     {
         public static string ReadCString(this BinaryReader reader, int length)
         {
@@ -79,6 +85,59 @@ namespace DemoParser.Demo_stuff
             }
 
             return Encoding.Default.GetString(result.ToArray());
+        }
+
+#if SLOW_PROTOBUF
+		public static T ReadProtobufMessage<T>(this BinaryReader reader)
+		{
+			return ReadProtobufMessage<T>(reader, PrefixStyle.Base128);
+		}
+
+		public static T ReadProtobufMessage<T>(this BinaryReader reader, PrefixStyle style)
+		{
+			return Serializer.DeserializeWithLengthPrefix<T>(reader.BaseStream, style);
+		}
+
+		public static IExtensible ReadProtobufMessage(this BinaryReader reader, Type T, PrefixStyle style)
+		{
+			var type = typeof(Serializer);
+			var deserialize = type.GetMethod("DeserializeWithLengthPrefix", new Type[] {
+				typeof(Stream),
+				typeof(PrefixStyle)
+			});
+
+			deserialize = deserialize.MakeGenericMethod(T);
+
+			return (IExtensible)deserialize.Invoke(null, new object[] { reader.BaseStream, style });
+		}
+
+		public static IExtensible ReadProtobufMessage(this Stream stream, Type T)
+		{
+			var type = typeof(Serializer);
+			var deserialize = type.GetMethod("Deserialize", new Type[] {
+				typeof(Stream),
+			});
+
+			deserialize = deserialize.MakeGenericMethod(T);
+
+			return (IExtensible)deserialize.Invoke(null, new object[] { stream });
+		}
+#endif
+
+        public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key,
+            TValue defaultValue)
+        {
+            return dictionary.TryGetValue(key, out var value) ? value : defaultValue;
+        }
+
+        public static bool HasFlagFast(this SendPropertyFlags flags, SendPropertyFlags check)
+        {
+            return (flags & check) == check;
+        }
+
+        public static RecordedPropertyUpdate<T> Record<T>(this PropertyUpdateEventArgs<T> args)
+        {
+            return new RecordedPropertyUpdate<T>(args.Property.Index, args.Value);
         }
     }
 }

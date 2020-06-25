@@ -5,17 +5,17 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using DemoParser.Demo_stuff.GoldSource.Verify;
-using DemoParser.Demo_stuff.L4D2Branch.PortalStuff.Result;
+using System.Windows.Forms;
+using VolvoWrench.Demo_stuff.GoldSource.Verify;
+using VolvoWrench.Demo_stuff.L4D2Branch.PortalStuff.Result;
 
-namespace DemoParser.Demo_stuff.GoldSource
+namespace VolvoWrench.Demo_stuff.GoldSource
 {
     /// <summary>
     ///     Types for HLSOOE
     /// </summary>
     public class Hlsooe
     {
-
         public enum DemoFrameType : sbyte
         {
             StartupPacket = 1,
@@ -81,15 +81,15 @@ namespace DemoParser.Demo_stuff.GoldSource
             public int IncomingReliableSequence;
             public int IncomingSequence;
             public int LastReliableSequence;
-            public L4D2Branch.PortalStuff.Result.Point3D LocalViewAngles;
-            public L4D2Branch.PortalStuff.Result.Point3D LocalViewAngles2;
+            public Point3D LocalViewAngles;
+            public Point3D LocalViewAngles2;
             public string Msg;
             public int OutgoingSequence;
             public int ReliableSequence;
-            public L4D2Branch.PortalStuff.Result.Point3D ViewAngles;
-            public L4D2Branch.PortalStuff.Result.Point3D ViewAngles2;
-            public L4D2Branch.PortalStuff.Result.Point3D ViewOrigin2;
-            public L4D2Branch.PortalStuff.Result.Point3D ViewOrigins;
+            public Point3D ViewAngles;
+            public Point3D ViewAngles2;
+            public Point3D ViewOrigin2;
+            public Point3D ViewOrigins;
         }
 
         /// <summary>
@@ -108,22 +108,12 @@ namespace DemoParser.Demo_stuff.GoldSource
             public string Magic;
         }
 
-        public struct FramesHren2
-        {
-            public DemoFrame Key;
-            public IFrame Value;
-            public FramesHren2(DemoFrame key, IFrame value)
-            {
-                this.Key = key;
-                this.Value = value;
-            }
-        }
         public class DemoDirectoryEntry
         {
             public int Filelength;
             public Dictionary<DemoFrame, ConsoleCommandFrame> Flags;
             public int FrameCount;
-            public List<FramesHren2> Frames;
+            public Dictionary<DemoFrame, IFrame> Frames;
             public int Offset;
             public float PlaybackTime;
             public int Type;
@@ -235,16 +225,6 @@ namespace DemoParser.Demo_stuff.GoldSource
             public List<KeyValuePair<Bxt.RuntimeDataType, Bxt.BXTData>> Objects;
         }
 
-        public struct FramesHren
-        {
-            public DemoFrame Key;
-            public IFrame Value;
-            public FramesHren(DemoFrame key, IFrame value)
-            {
-                this.Key = key;
-                this.Value = value;
-            }
-        }
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct DemoDirectoryEntry
         {
@@ -253,7 +233,7 @@ namespace DemoParser.Demo_stuff.GoldSource
             public int FileLength;
             public int Flags;
             public int FrameCount;
-            public List<FramesHren> Frames;
+            public Dictionary<DemoFrame, IFrame> Frames;
             public int Offset;
             public float TrackTime;
             public int Type;
@@ -296,8 +276,8 @@ namespace DemoParser.Demo_stuff.GoldSource
         public struct ClientDataFrame : IFrame
         {
             public float Fov;
-            public L4D2Branch.PortalStuff.Result.Point3D Origin;
-            public DPoint3D Viewangles;
+            public Point3D Origin;
+            public dPoint3D Viewangles;
             public int WeaponBits;
             public int ErrAngles;
         }
@@ -314,7 +294,7 @@ namespace DemoParser.Demo_stuff.GoldSource
 
             public struct EventArgs
             {
-                public L4D2Branch.PortalStuff.Result.Point3D Angles;
+                public Point3D Angles;
                 public int Bparam1;
                 public int Bparam2;
                 public int Ducking;
@@ -324,8 +304,8 @@ namespace DemoParser.Demo_stuff.GoldSource
                 public float Fparam2;
                 public int Iparam1;
                 public int Iparam2;
-                public L4D2Branch.PortalStuff.Result.Point3D Origin;
-                public L4D2Branch.PortalStuff.Result.Point3D Velocity;
+                public Point3D Origin;
+                public Point3D Velocity;
             }
         }
 
@@ -369,45 +349,16 @@ namespace DemoParser.Demo_stuff.GoldSource
             public RefParams RParms;
             public float Timestamp;
             public UserCmd UCmd;
-            public L4D2Branch.PortalStuff.Result.Point3D View;
+            public Point3D View;
             public int Viewmodel;
-
-            public override bool Equals(object obj)
-            {
-                return obj is NetMsgFrame frame &&
-                       EqualityComparer<RefParams>.Default.Equals(RParms, frame.RParms) &&
-                       Timestamp == frame.Timestamp &&
-                       EqualityComparer<UserCmd>.Default.Equals(UCmd, frame.UCmd) &&
-                       EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(View, frame.View);
-            }
-
-            public override int GetHashCode()
-            {
-                int hashCode = -29378089;
-                hashCode = hashCode * -1521134295 + RParms.GetHashCode();
-                hashCode = hashCode * -1521134295 + Timestamp.GetHashCode();
-                hashCode = hashCode * -1521134295 + UCmd.GetHashCode();
-                hashCode = hashCode * -1521134295 + View.GetHashCode();
-                return hashCode;
-            }
-
-            public static bool operator ==(NetMsgFrame left, NetMsgFrame right)
-            {
-                return left.Equals(right);
-            }
-
-            public static bool operator !=(NetMsgFrame left, NetMsgFrame right)
-            {
-                return !(left == right);
-            }
 
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
             public struct RefParams
             {
-                public DPoint3D ClViewangles;
-                public L4D2Branch.PortalStuff.Result.Point3D Crosshairangle;
+                public dPoint3D ClViewangles;
+                public Point3D Crosshairangle;
                 public int Demoplayback;
-                public L4D2Branch.PortalStuff.Result.Point3D Forward;
+                public Point3D Forward;
                 public float Frametime;
                 public int Hardware;
                 public int Health;
@@ -422,96 +373,21 @@ namespace DemoParser.Demo_stuff.GoldSource
                 public int Playernum;
                 public int PtrCmd;
                 public int PtrMovevars;
-                public L4D2Branch.PortalStuff.Result.Point3D Punchangle;
-                public L4D2Branch.PortalStuff.Result.Point3D Right;
-                public L4D2Branch.PortalStuff.Result.Point3D Simorg;
-                public L4D2Branch.PortalStuff.Result.Point3D Simvel;
+                public Point3D Punchangle;
+                public Point3D Right;
+                public Point3D Simorg;
+                public Point3D Simvel;
                 public int Smoothing;
                 public int Spectator;
                 public float Time;
-                public L4D2Branch.PortalStuff.Result.Point3D Up;
-                public DPoint3D Viewangles;
+                public Point3D Up;
+                public dPoint3D Viewangles;
                 public int Viewentity;
-                public L4D2Branch.PortalStuff.Result.Point3D Viewheight;
-                public L4D2Branch.PortalStuff.Result.Point3D Vieworg;
+                public Point3D Viewheight;
+                public Point3D Vieworg;
                 public Point4D Viewport;
                 public float Viewsize;
                 public int Waterlevel;
-
-                public override bool Equals(object obj)
-                {
-                    return obj is RefParams @params &&
-                           EqualityComparer<DPoint3D>.Default.Equals(ClViewangles, @params.ClViewangles) &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Crosshairangle, @params.Crosshairangle) &&
-                           Demoplayback == @params.Demoplayback &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Forward, @params.Forward) &&
-                           Hardware == @params.Hardware &&
-                           Health == @params.Health &&
-                           Idealpitch == @params.Idealpitch &&
-                           Intermission == @params.Intermission &&
-                           Maxclients == @params.Maxclients &&
-                           MaxEntities == @params.MaxEntities &&
-                           NextView == @params.NextView &&
-                           Onground == @params.Onground &&
-                           OnlyClientDraw == @params.OnlyClientDraw &&
-                           Paused == @params.Paused &&
-                           Playernum == @params.Playernum &&
-                           PtrCmd == @params.PtrCmd &&
-                           PtrMovevars == @params.PtrMovevars &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Punchangle, @params.Punchangle) &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Right, @params.Right) &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Simorg, @params.Simorg) &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Simvel, @params.Simvel) &&
-                           Smoothing == @params.Smoothing &&
-                           Spectator == @params.Spectator &&
-                           Time == @params.Time &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Up, @params.Up) &&
-                           EqualityComparer<DPoint3D>.Default.Equals(Viewangles, @params.Viewangles) &&
-                           Viewentity == @params.Viewentity &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Viewheight, @params.Viewheight) &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(Vieworg, @params.Vieworg) &&
-                           EqualityComparer<Point4D>.Default.Equals(Viewport, @params.Viewport) &&
-                           Viewsize == @params.Viewsize &&
-                           Waterlevel == @params.Waterlevel;
-                }
-
-                public override int GetHashCode()
-                {
-                    int hashCode = -318104989;
-                    hashCode = hashCode * -1521134295 + ClViewangles.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Crosshairangle.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Demoplayback.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Forward.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Hardware.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Health.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Idealpitch.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Intermission.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Maxclients.GetHashCode();
-                    hashCode = hashCode * -1521134295 + MaxEntities.GetHashCode();
-                    hashCode = hashCode * -1521134295 + NextView.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Onground.GetHashCode();
-                    hashCode = hashCode * -1521134295 + OnlyClientDraw.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Paused.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Playernum.GetHashCode();
-                    hashCode = hashCode * -1521134295 + PtrCmd.GetHashCode();
-                    hashCode = hashCode * -1521134295 + PtrMovevars.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Punchangle.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Right.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Simorg.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Simvel.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Smoothing.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Spectator.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Time.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Up.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewangles.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewentity.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewheight.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Vieworg.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewport.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewsize.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Waterlevel.GetHashCode();
-                    return hashCode;
-                }
             }
 
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -524,58 +400,15 @@ namespace DemoParser.Demo_stuff.GoldSource
                 public ushort Buttons;
                 public float Forwardmove;
                 public int ImpactIndex;
-                public L4D2Branch.PortalStuff.Result.Point3D ImpactPosition;
+                public Point3D ImpactPosition;
                 public sbyte Impulse;
                 public int LerpMsec;
                 public sbyte Lightlevel;
                 public sbyte Msec;
                 public float Sidemove;
                 public float Upmove;
-                public DPoint3D Viewangles;
+                public dPoint3D Viewangles;
                 public sbyte Weaponselect;
-
-                public override bool Equals(object obj)
-                {
-                    return obj is UserCmd cmd &&
-                           Align1 == cmd.Align1 &&
-                           Align2 == cmd.Align2 &&
-                           Align3 == cmd.Align3 &&
-                           Align4 == cmd.Align4 &&
-                           Buttons == cmd.Buttons &&
-                           Forwardmove == cmd.Forwardmove &&
-                           ImpactIndex == cmd.ImpactIndex &&
-                           EqualityComparer<L4D2Branch.PortalStuff.Result.Point3D>.Default.Equals(ImpactPosition, cmd.ImpactPosition) &&
-                           Impulse == cmd.Impulse &&
-                           LerpMsec == cmd.LerpMsec &&
-                           Lightlevel == cmd.Lightlevel &&
-                           Msec == cmd.Msec &&
-                           Sidemove == cmd.Sidemove &&
-                           Upmove == cmd.Upmove &&
-                           EqualityComparer<DPoint3D>.Default.Equals(Viewangles, cmd.Viewangles) &&
-                           Weaponselect == cmd.Weaponselect;
-                }
-
-                public override int GetHashCode()
-                {
-                    int hashCode = 2037803237;
-                    hashCode = hashCode * -1521134295 + Align1.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Align2.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Align3.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Align4.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Buttons.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Forwardmove.GetHashCode();
-                    hashCode = hashCode * -1521134295 + ImpactIndex.GetHashCode();
-                    hashCode = hashCode * -1521134295 + ImpactPosition.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Impulse.GetHashCode();
-                    hashCode = hashCode * -1521134295 + LerpMsec.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Lightlevel.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Msec.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Sidemove.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Upmove.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Viewangles.GetHashCode();
-                    hashCode = hashCode * -1521134295 + Weaponselect.GetHashCode();
-                    return hashCode;
-                }
             }
 
             [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -917,7 +750,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                 FrameCount = br.ReadInt32(),
                                 Offset = br.ReadInt32(),
                                 Filelength = br.ReadInt32(),
-                                Frames = new List<Hlsooe.FramesHren2>(),
+                                Frames = new Dictionary<Hlsooe.DemoFrame, Hlsooe.IFrame>(),
                                 Flags = new Dictionary<Hlsooe.DemoFrame, Hlsooe.ConsoleCommandFrame>()
                             };
                             hlsooeDemo.DirectoryEntries.Add(tempvar);
@@ -970,17 +803,17 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         {
                                             Flags = br.ReadInt32(),
                                             ViewOrigins =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewOrigin2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             IncomingSequence = br.ReadInt32(),
                                             IncomingAcknowledged = br.ReadInt32(),
                                             IncomingReliableAcknowledged = br.ReadInt32(),
@@ -993,7 +826,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         g.Msg = Encoding.ASCII.GetString(br.ReadBytes(spml))
                                             .Trim('\0')
                                             .Replace("\0", string.Empty);
-                                        entry.Frames.Add(new Hlsooe.FramesHren2( currentDemoFrame, g));
+                                        entry.Frames.Add(currentDemoFrame, g);
                                         break;
                                     case Hlsooe.DemoFrameType.NetworkPacket:
                                         if (UnexpectedEof(br, 108))
@@ -1003,17 +836,17 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         {
                                             Flags = br.ReadInt32(),
                                             ViewOrigins =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewOrigin2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             IncomingSequence = br.ReadInt32(),
                                             IncomingAcknowledged = br.ReadInt32(),
                                             IncomingReliableAcknowledged = br.ReadInt32(),
@@ -1026,11 +859,11 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         b.Msg = Encoding.ASCII.GetString(br.ReadBytes(nml))
                                             .Trim('\0')
                                             .Replace("\0", string.Empty);
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, b));
+                                        entry.Frames.Add(currentDemoFrame, b);
                                         break;
                                     case Hlsooe.DemoFrameType.Jumptime:
                                         //No extra stuff
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, new Hlsooe.JumpTimeFrame()));
+                                        entry.Frames.Add(currentDemoFrame, new Hlsooe.JumpTimeFrame());
                                         break;
                                     case Hlsooe.DemoFrameType.ConsoleCommand:
                                         if (UnexpectedEof(br, 4))
@@ -1054,7 +887,7 @@ namespace DemoParser.Demo_stuff.GoldSource
 
                                         if (a.Command.Contains("changelevel2")) entry.Flags.Add(currentDemoFrame, a);
 
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, a));
+                                        entry.Frames.Add(currentDemoFrame, a);
                                         break;
                                     case Hlsooe.DemoFrameType.Usercmd:
                                         if (UnexpectedEof(br, 4 + 4 + 2))
@@ -1077,7 +910,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             Encoding.ASCII.GetString(br.ReadBytes(usercmdlength))
                                                 .Trim('\0')
                                                 .Replace("\0", string.Empty);
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, c));
+                                        entry.Frames.Add(currentDemoFrame, c);
                                         break;
                                     case Hlsooe.DemoFrameType.Stringtables:
                                         var e = new Hlsooe.StringTablesFrame();
@@ -1096,7 +929,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             .Trim('\0')
                                             .Replace("\0", string.Empty);
                                         e.Data = edata;
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, e));
+                                        entry.Frames.Add(currentDemoFrame, e);
                                         break;
                                     case Hlsooe.DemoFrameType.NetworkDataTable:
                                         var d = new Hlsooe.NetworkDataTableFrame();
@@ -1114,11 +947,11 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         d.Data = Encoding.ASCII.GetString(br.ReadBytes(networktablelength))
                                             .Trim('\0')
                                             .Replace("\0", string.Empty);
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, d));
+                                        entry.Frames.Add(currentDemoFrame, d);
                                         break;
                                     case Hlsooe.DemoFrameType.NextSection:
                                         nextSectionRead = true;
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, new Hlsooe.NextSectionFrame()));
+                                        entry.Frames.Add(currentDemoFrame, new Hlsooe.NextSectionFrame());
                                         break;
                                     default:
                                         if (UnexpectedEof(br, 108))
@@ -1130,17 +963,17 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         {
                                             Flags = br.ReadInt32(),
                                             ViewOrigins =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewOrigin2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             ViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             LocalViewAngles2 =
-                                                new L4D2Branch.PortalStuff.Result.Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
+                                                new Point3D(br.ReadSingle(), br.ReadSingle(), br.ReadSingle()),
                                             IncomingSequence = br.ReadInt32(),
                                             IncomingAcknowledged = br.ReadInt32(),
                                             IncomingReliableAcknowledged = br.ReadInt32(),
@@ -1153,7 +986,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         err.Msg = Encoding.ASCII.GetString(br.ReadBytes(dml))
                                             .Trim('\0')
                                             .Replace("\0", string.Empty);
-                                        entry.Frames.Add(new Hlsooe.FramesHren2(currentDemoFrame, err));
+                                        entry.Frames.Add(currentDemoFrame, err);
                                         break;
 
                                         #endregion
@@ -1232,66 +1065,35 @@ namespace DemoParser.Demo_stuff.GoldSource
                             throw new Exception("E2");
                         }
                         //  return gDemo;
-                       
-                        //if (entryCount < 1 || entryCount > 5)
-                        //{
-                        //   // entryCount = 2;
-                        //    Console.WriteLine(gDemo.Header.DemoProtocol);
-                        //    Console.WriteLine(gDemo.Header.NetProtocol);
-                        //    Console.WriteLine(gDemo.Header.MapName);
-                        //    Console.WriteLine(gDemo.Header.GameDir);
-                        //    Console.WriteLine(gDemo.Header.MapCrc);
-                        //    Console.WriteLine(gDemo.Header.DirectoryOffset);
-                        //    Console.WriteLine(entryCount);
-                        //    Console.WriteLine("Warning!Hacked demo! ");
-                        //}
+                        var entryCount = br.ReadInt32();
 
-                        if ( gDemo.Header.DirectoryOffset == 0 )
+                        //if (entryCount < 1 || entryCount > 3) entryCount = 2;
+
+                        //if (gDemo.Header.DirectoryOffset == 0) entryCount = 2;
+
+                        for (var i = 0; i < entryCount; i++)
                         {
-                            Console.WriteLine("Warning! Bad entries count! Using 'bruteforce' read method!");
+                            if (UnexpectedEof(br, 4 + 64 + 4 + 4 + 4 + 4 + 4 + 4))
+                            {
+                                gDemo.ParsingErrors.Add("Unexpected end of file when reading the directory entries!");
+
+                                throw new Exception("E");
+                            }
+                            //return gDemo;
                             var tempvar = new GoldSource.DemoDirectoryEntry
                             {
-                                Type = 0,
+                                Type = br.ReadInt32(),
                                 Description =
-                                       "Playback",
-                                Flags = 0,
-                                CdTrack = 0,
-                                TrackTime = 444.0f,
-                                FrameCount = 44444444,
-                                Offset = 0 ,
-                                FileLength = 0,
-                                Frames = new List<GoldSource.FramesHren>()
+                                    Encoding.ASCII.GetString(br.ReadBytes(64)).Trim('\0').Replace("\0", string.Empty),
+                                Flags = br.ReadInt32(),
+                                CdTrack = br.ReadInt32(),
+                                TrackTime = br.ReadSingle(),
+                                FrameCount = br.ReadInt32(),
+                                Offset = br.ReadInt32(),
+                                FileLength = br.ReadInt32(),
+                                Frames = new Dictionary<GoldSource.DemoFrame, GoldSource.IFrame>()
                             };
                             gDemo.DirectoryEntries.Add(tempvar);
-                        }
-                        else
-                        {
-                            var entryCount = br.ReadInt32();
-
-                            for (var i = 0; i < entryCount; i++)
-                            {
-                                if (UnexpectedEof(br, 4 + 64 + 4 + 4 + 4 + 4 + 4 + 4))
-                                {
-                                    gDemo.ParsingErrors.Add("Unexpected end of file when reading the directory entries!");
-
-                                    //  throw new Exception("E3");
-                                }
-                                //return gDemo;
-                                var tempvar = new GoldSource.DemoDirectoryEntry
-                                {
-                                    Type = br.ReadInt32(),
-                                    Description =
-                                        Encoding.ASCII.GetString(br.ReadBytes(64)).Trim('\0').Replace("\0", string.Empty),
-                                    Flags = br.ReadInt32(),
-                                    CdTrack = br.ReadInt32(),
-                                    TrackTime = br.ReadSingle(),
-                                    FrameCount = br.ReadInt32(),
-                                    Offset = br.ReadInt32(),
-                                    FileLength = br.ReadInt32(),
-                                    Frames = new List<GoldSource.FramesHren>()
-                                };
-                                gDemo.DirectoryEntries.Add(tempvar);
-                            }
                         }
                         //s1.Stop();
                         //var s2 = new System.Diagnostics.Stopwatch();
@@ -1304,15 +1106,12 @@ namespace DemoParser.Demo_stuff.GoldSource
                             try
                             {
                                 dirid++;
-                                if (entry.Offset != 0)
+                                if (UnexpectedEof(br, entry.Offset - br.BaseStream.Position))
                                 {
-                                    if (UnexpectedEof(br, entry.Offset - br.BaseStream.Position))
-                                    {
-                                        gDemo.ParsingErrors.Add("Unexpected end of file when seeking to directory entry!");
-                                        throw new Exception("E4");
-                                    }
-                                    br.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
+                                    gDemo.ParsingErrors.Add("Unexpected end of file when seeking to directory entry!");
+                                    throw new Exception("E");
                                 }
+                                br.BaseStream.Seek(entry.Offset, SeekOrigin.Begin);
                                 var ind = 0;
                                 var nextSectionRead = false;
                                 while (!nextSectionRead)
@@ -1320,11 +1119,9 @@ namespace DemoParser.Demo_stuff.GoldSource
                                     ind++;
                                     if (UnexpectedEof(br, 1 + 4 + 4))
                                     {
-                                        if (entry.Offset != 0)
-                                            gDemo.ParsingErrors.Add(
+                                        gDemo.ParsingErrors.Add(
                                             "Unexpected end of file when reading the header of the frame: " + ind + 1);
-                                        nextSectionRead = true;
-                                        break;
+                                        throw new Exception("E");
                                     }
 
                                     var type = br.ReadByte();
@@ -1350,18 +1147,18 @@ namespace DemoParser.Demo_stuff.GoldSource
                                         Index = ind
                                     };
 
-                                    // Application.DoEvents();
+                                    Application.DoEvents();
 
 
 
                                     // File.AppendAllText("events.log", currentDemoFrame.Type + "->" + currentDemoFrame.Index + "->" + currentDemoFrame.FrameIndex + "->" + currentDemoFrame.Time + "\n");
 
                                     #region Frame Switch
-                                    //Console.WriteLine(currentDemoFrame.Type);
+
                                     switch (currentDemoFrame.Type)
                                     {
                                         case GoldSource.DemoFrameType.DemoStart: //No extra dat
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, new GoldSource.DemoStartFrame()));
+                                            entry.Frames.Add(currentDemoFrame, new GoldSource.DemoStartFrame());
                                             break;
                                         case GoldSource.DemoFrameType.ConsoleCommand:
                                             var ccframe = new GoldSource.ConsoleCommandFrame();
@@ -1370,16 +1167,15 @@ namespace DemoParser.Demo_stuff.GoldSource
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading console command at frame: " +
                                                     ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
+                                                // return gDemo;
                                             }
                                             var cmd = br.ReadBytes(64);
                                             ccframe.Command = Encoding.ASCII.GetString(cmd)
                                                 .Trim('\0')
                                                 .Replace("\0", string.Empty);
                                             ccframe.BxtData = ExtractIncludedBytes(cmd);
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, ccframe));
+                                            entry.Frames.Add(currentDemoFrame, ccframe);
                                             break;
                                         case GoldSource.DemoFrameType.ClientData:
                                             var cdframe = new GoldSource.ClientDataFrame();
@@ -1388,9 +1184,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading clientdataframe at frame: " +
                                                     ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 // return gDemo;
                                             }
                                             cdframe.Origin.X = br.ReadSingle();
@@ -1434,12 +1228,11 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             cdframe.Viewangles.Z = tmpfloat;
                                             cdframe.WeaponBits = br.ReadInt32();
                                             cdframe.Fov = br.ReadSingle();
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, cdframe));
+                                            entry.Frames.Add(currentDemoFrame, cdframe);
                                             break;
                                         case GoldSource.DemoFrameType.NextSection:
-                                            if ( entry.Offset != 0 )
                                             nextSectionRead = true;
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, new GoldSource.NextSectionFrame()));
+                                            entry.Frames.Add(currentDemoFrame, new GoldSource.NextSectionFrame());
                                             break;
                                         case GoldSource.DemoFrameType.Event:
                                             var eframe = new GoldSource.EventFrame();
@@ -1447,9 +1240,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file at when reading eventframe on frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 // return gDemo;
                                             }
                                             eframe.Flags = br.ReadInt32();
@@ -1473,7 +1264,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             eframe.EventArguments.Iparam2 = br.ReadInt32();
                                             eframe.EventArguments.Bparam1 = br.ReadInt32();
                                             eframe.EventArguments.Bparam2 = br.ReadInt32();
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, eframe));
+                                            entry.Frames.Add(currentDemoFrame, eframe);
                                             break;
                                         case GoldSource.DemoFrameType.WeaponAnim:
                                             var waframe = new GoldSource.WeaponAnimFrame();
@@ -1481,14 +1272,12 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading weaponanim at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 //return gDemo;
                                             }
                                             waframe.Anim = br.ReadInt32();
                                             waframe.Body = br.ReadInt32();
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, waframe));
+                                            entry.Frames.Add(currentDemoFrame, waframe);
                                             break;
                                         case GoldSource.DemoFrameType.Sound:
                                             var sframe = new GoldSource.SoundFrame();
@@ -1496,9 +1285,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading sound channel at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 //  return gDemo;
                                             }
                                             sframe.Channel = br.ReadInt32();
@@ -1507,9 +1294,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading sound data at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 //  return gDemo;
                                             }
                                             sframe.Sample = br.ReadBytes(samplelength);
@@ -1517,7 +1302,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             sframe.Volume = br.ReadSingle();
                                             sframe.Flags = br.ReadInt32();
                                             sframe.Pitch = br.ReadInt32();
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, sframe));
+                                            entry.Frames.Add(currentDemoFrame, sframe);
                                             break;
                                         case GoldSource.DemoFrameType.DemoBuffer:
                                             var bframe = new GoldSource.DemoBufferFrame();
@@ -1525,9 +1310,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when demobuffer data at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 // return gDemo;
                                             }
                                             var buggerlength = br.ReadInt32();
@@ -1535,13 +1318,11 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when reading buffer data at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 // return gDemo;
                                             }
                                             bframe.Buffer = br.ReadBytes(buggerlength);
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, bframe));
+                                            entry.Frames.Add(currentDemoFrame, bframe);
                                             break;
                                         case GoldSource.DemoFrameType.NetMsg:
                                         default:
@@ -1550,9 +1331,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when default frame at frame: " + ind);
-
-                                                nextSectionRead = true;
-                                                break;
+                                                throw new Exception("E");
                                                 // return gDemo;
                                             }
                                             nf.Timestamp = br.ReadSingle();
@@ -1788,7 +1567,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                             {
                                                 gDemo.ParsingErrors.Add(
                                                     "Unexpected end of file when default frame message at frame: " + ind);
-                                                throw new Exception("E15");
+                                                throw new Exception("E");
                                             }
                                             nf.MsgBytes = br.ReadBytes(msglength);
                                             if (nf.MsgBytes.Length != msglength)
@@ -1801,7 +1580,7 @@ namespace DemoParser.Demo_stuff.GoldSource
                                                 
                                             }
                                             nf.Msg = ByteArrayToString(nf.MsgBytes);
-                                            entry.Frames.Add(new GoldSource.FramesHren(currentDemoFrame, nf));
+                                            entry.Frames.Add(currentDemoFrame, nf);
                                             break;
 
                                     }
@@ -1809,17 +1588,16 @@ namespace DemoParser.Demo_stuff.GoldSource
                                     #endregion
                                 }
                             }
-                            catch (Exception ex)
+                            catch
                             {
-                                Console.WriteLine("Fatal error:" + ex.Message);
                             }
 
                         //here
                         var first = true;
                         foreach (var f in from entry in gDemo.DirectoryEntries
-                                          from frame in entry.Frames
-                                          where (int)frame.Key.Type < 2 || (int)frame.Key.Type > 9
-                                          select (GoldSource.NetMsgFrame)frame.Value)
+                                                             from frame in entry.Frames
+                                                             where (int)frame.Key.Type < 2 || (int)frame.Key.Type > 9
+                                                             select (GoldSource.NetMsgFrame)frame.Value)
                         {
                             gDemo.AditionalStats.FrametimeSum += f.RParms.Frametime;
                             gDemo.AditionalStats.MsecSum += f.UCmd.Msec;

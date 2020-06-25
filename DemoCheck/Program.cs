@@ -69,7 +69,7 @@ Details: (Average msec                                           , 60,05 FPS)
             {
                 for (int frameindex = 0; frameindex < CurrentDemoFile.GsDemoInfo.DirectoryEntries[index].Frames.Count; frameindex++)
                 {
-                    // var frame = CurrentDemoFile.GsDemoInfo.DirectoryEntries[index].Frames[frameindex]; // WHY error!?
+                     var frame = CurrentDemoFile.GsDemoInfo.DirectoryEntries[index].Frames[frameindex]; // WHY error!?
 
                     // Console.WriteLine($"frame.Key.Type = {frame.Key.Type}"); // TOO
                 }
@@ -95,7 +95,8 @@ Details: (Average msec                                           , 60,05 FPS)
                         if (!check.Enabled)
                             continue;
                 
-                        check.Frame(frame);
+                        //TODO: Fixme
+                        //check.Frame(frame);
                     }
                 
                     if (!enableDataLogging)
@@ -147,14 +148,14 @@ Details: (Average msec                                           , 60,05 FPS)
                 
                                 break;
                             }
-                        /*
+
                         case GoldSource.DemoFrameType.NetMsg:
                             {
                                 break;
                             }
 
-                        */
-                    case GoldSource.DemoFrameType.DemoBuffer:
+
+                        case GoldSource.DemoFrameType.DemoBuffer:
                         {
                             var DemoBuffer = ((GoldSource.DemoBufferFrame)frame.Value);
                             var DemoBuffer_string = "DemoBuffer: {\n"
