@@ -4,8 +4,10 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.Versioning;
 using System.Text;
+using System.Drawing;
 
 using DemoCheck.Tools;
+using DemoParser.Demo_stuff.GoldSource;
 
 namespace DemoCheck.Analyzer
 {
@@ -21,43 +23,32 @@ namespace DemoCheck.Analyzer
             return "StartAnalyze()";
         }
 
-        const int FRAMES_COUNT = 3;
-        LimitedStack<int> frames = new LimitedStack<int>(FRAMES_COUNT);
+        const int FRAMES_COUNT = 2;
+        LimitedStack<KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame>> frames = new LimitedStack<KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame>>(FRAMES_COUNT);
 
-        public override void Frame(int frameData)
+        public override void Frame(KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame> frameData)
         {
-            frames.Push(frameData);
+            if(frameData.Key.Type == GoldSource.DemoFrameType.ClientData)
+                frames.Push(frameData);
 
             if (frames.Count() < FRAMES_COUNT)
             {
                 // Console.WriteLine($"Not enough frames for analyze! frames.Count()");
                 return;
             }
-            GetFrames();
+            Analyze();
         }
 
-        public void GetFrames()
+        public void Analyze()
         {
             Console.WriteLine("\n\nStackData:");
 
             var frames_arr = frames.ToArray();
             var frames_arr_length = frames_arr.Length;
+            
             for (int i = 0; i < frames_arr_length; i++)
             {
-                Console.WriteLine("\tFrameData: " + frames_arr[i]);
-                if(i > 0)
-                {
-                    var diffWithPrevFrame = Math.Abs(frames_arr[i - 1] - frames_arr[i]);
-                    if (diffWithPrevFrame > 1)
-                        Console.WriteLine($"\t !!!!BAD Prev! {diffWithPrevFrame}");
-                }
-
-                if (i < (frames_arr_length - 1))
-                {
-                    var diffWithNextFrame = Math.Abs(frames_arr[i + 1] - frames_arr[i]);
-                    if (diffWithNextFrame > 1)
-                        Console.WriteLine($"\t !!!!BAD Next! {diffWithNextFrame}");
-                }
+                
             }
         }
     }

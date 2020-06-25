@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DemoParser.Demo_stuff.GoldSource;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -18,6 +19,6 @@ namespace DemoCheck.Analyzer
             return "StartAnalyze()";
         }
 
-        public virtual void Frame(int frameData) { }
+        public virtual void Frame(KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame> frameData) { }
     }
 }
