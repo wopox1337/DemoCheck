@@ -13,14 +13,14 @@ namespace DemoCheck
     {
         const string CurrentFile = "test.dem";
         static CrossParseResult CurrentDemoFile;
-        static bool enableDataLogging = true;
+        static bool enableDataLogging = false;
 
         static void Main(string[] args)
         {
             Base[] checks =
             {
                 new Base() { Enabled = false },
-                new BunnyHop() { Enabled = false },
+                new BunnyHop() { Enabled = true },
                 new AimBot() { Enabled = false },
                // new StrafeChecker()
             };
@@ -64,46 +64,29 @@ Details: (Average msec                                           , 60,05 FPS)
                 return;
             }
 
-            #region WHY NOT WORKS?!
-            for (var index = 0; index < CurrentDemoFile.GsDemoInfo.DirectoryEntries.Count; index++)
-            {
-                for (int frameindex = 0; frameindex < CurrentDemoFile.GsDemoInfo.DirectoryEntries[index].Frames.Count; frameindex++)
-                {
-                     var frame = CurrentDemoFile.GsDemoInfo.DirectoryEntries[index].Frames[frameindex]; // WHY error!?
-
-                    // Console.WriteLine($"frame.Key.Type = {frame.Key.Type}"); // TOO
-                }
-            }
-            #endregion
-
             #region My code
-            var demo_entries = CurrentDemoFile.GsDemoInfo.DirectoryEntries;
-            foreach(var entry in demo_entries)
+            foreach(var entry in CurrentDemoFile.GsDemoInfo.DirectoryEntries)
             {
                 if (entry.Type != 1) // Only PLAYBACK state
                     continue;
-
-                var frames_dictionary = entry.Frames;
                 
                 int frame_index = 0;
-                foreach (var frame in frames_dictionary)
+                foreach (var frame in entry.Frames)
                 {
-                    var type = frame.Key.Type;
-                
                     foreach (var check in checks)
                     {
                         if (!check.Enabled)
                             continue;
                 
-                        //TODO: Fixme
-                        //check.Frame(frame);
+                        check.Frame(frame);
                     }
-                
+
                     if (!enableDataLogging)
                         continue;
 
-                    Console.WriteLine($"Type: {type}");
-                    
+                    var type = frame.Key.Type;
+                    //Console.WriteLine($"Type: {type}");
+
                     switch (type)
                     {
                         case GoldSource.DemoFrameType.ConsoleCommand:
@@ -151,21 +134,15 @@ Details: (Average msec                                           , 60,05 FPS)
 
                         case GoldSource.DemoFrameType.NetMsg:
                             {
+                                var NetMsgData = ((GoldSource.NetMsgFrame)frame.Value);
+
+                                var NetMsgData_string = "NetMsgData: {\n"
+                                    + $"\t {NetMsgData.RParms.ClViewangles.X}"
+                                    + "\n}";
+
+                                Console.WriteLine(NetMsgData_string);
                                 break;
                             }
-
-
-                        case GoldSource.DemoFrameType.DemoBuffer:
-                        {
-                            var DemoBuffer = ((GoldSource.DemoBufferFrame)frame.Value);
-                            var DemoBuffer_string = "DemoBuffer: {\n"
-                                + $"\t Buffer: {DemoBuffer.Buffer}"
-                                + "\n}";
-
-                            Console.WriteLine(DemoBuffer_string);
-
-                            break;
-                        }
                         
                         case GoldSource.DemoFrameType.WeaponAnim:
                             {
@@ -180,8 +157,7 @@ Details: (Average msec                                           , 60,05 FPS)
             }
             #endregion
 
-            Console.WriteLine($"FILE opened!");
-
+            Console.WriteLine($"Analyze finished!");
             Console.ReadKey();
         }
     }

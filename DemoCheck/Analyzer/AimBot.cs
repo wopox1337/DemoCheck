@@ -23,9 +23,9 @@ namespace DemoCheck.Analyzer
         }
 
         const int FRAMES_COUNT = 2;
-        LimitedStack<KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame>> frames = new LimitedStack<KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame>>(FRAMES_COUNT);
+        LimitedStack<GoldSource.FramesHren> frames = new LimitedStack<GoldSource.FramesHren>(FRAMES_COUNT);
 
-        public override void Frame(KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame> frameData)
+        public override void Frame(GoldSource.FramesHren frameData)
         {
             if (frameData.Key.Type == GoldSource.DemoFrameType.ClientData)
                 frames.Push(frameData);
@@ -51,7 +51,7 @@ namespace DemoCheck.Analyzer
                     var prev_frame = (GoldSource.ClientDataFrame)frames_arr[i - 1].Value;
                     var distance = GetDistance(current_frame.Viewangles.X, current_frame.Viewangles.Y, prev_frame.Viewangles.X, prev_frame.Viewangles.Y);
 
-                    if (distance > 0)
+                    //if (distance > 0)
                     {
                         var str = $"{Name} => distance: ";
                         if (distance > 10)
@@ -66,7 +66,13 @@ namespace DemoCheck.Analyzer
         }
         private static double GetDistance(double x1, double y1, double x2, double y2)
         {
-            return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
+            return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow(GetAngle(y2, y1), 2));
         }
+
+        private static double GetAngle(double x1, double x2)
+        {
+            return Math.Atan2(Math.Sin(x1 - x2), Math.Cos(x1 - x2));
+        }
+
     }
 }

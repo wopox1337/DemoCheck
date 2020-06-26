@@ -19,6 +19,6 @@ namespace DemoCheck.Analyzer
             return "StartAnalyze()";
         }
 
-        public virtual void Frame(KeyValuePair<GoldSource.DemoFrame, GoldSource.IFrame> frameData) { }
+        public virtual void Frame(GoldSource.FramesHren frameData) { }
     }
 }
