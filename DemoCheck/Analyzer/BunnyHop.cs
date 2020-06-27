@@ -8,6 +8,8 @@ using System.Drawing;
 
 using DemoCheck.Tools;
 using DemoParser.Demo_stuff.GoldSource;
+using System.Runtime.InteropServices.ComTypes;
+using System.Net;
 
 namespace DemoCheck.Analyzer
 {
@@ -23,16 +25,18 @@ namespace DemoCheck.Analyzer
             return "StartAnalyze()";
         }
 
-        const int FRAMES_COUNT = 2;
-        LimitedStack<GoldSource.FramesHren> frames = new LimitedStack<GoldSource.FramesHren>(30);
-
-        // Frames on ground before Jump (or Duck)
-        private int FOG;
+        const int FRAMES_COUNT = 5;
+        LimitedStack<GoldSource.FramesHren> frames = new LimitedStack<GoldSource.FramesHren>(FRAMES_COUNT);
 
         public override void Frame(GoldSource.FramesHren frameData)
         {
-            if (frameData.Key.Type == GoldSource.DemoFrameType.NetMsg)
-                frames.Push(frameData);
+            if (frameData.Key.Type != GoldSource.DemoFrameType.NetMsg)
+                return;
+            
+            frames.Push(frameData);
+            //prev_frame = frame;
+            //frame = (GoldSource.NetMsgFrame)frameData.Value;
+            //Check_BhopHack_Type1(prev_frame, frame);
 
             if (frames.Count() < FRAMES_COUNT)
             {
@@ -42,29 +46,29 @@ namespace DemoCheck.Analyzer
             Analyze();
         }
 
+        private float current_frame_time;
+
         public void Analyze()
         {
             var frames_arr = frames.ToArray();
-            var frames_arr_length = frames_arr.Length;
+            //var frames_arr_length = frames_arr.Length;
+            //Console.WriteLine($"0:{frames_arr[0].Key.FrameIndex}, 1:{frames_arr[1].Key.FrameIndex}, 2:{frames_arr[2].Key.FrameIndex}, 3:{frames_arr[3].Key.FrameIndex}");
             
-            for (int i = 0; i < frames_arr_length; i++)
-            {
-                if (i < 1)
-                    continue;
 
-                var prev_frame = (GoldSource.NetMsgFrame)frames_arr[i - 1].Value;
-                var current_frame = (GoldSource.NetMsgFrame)frames_arr[i].Value;
+            var current_frame = (GoldSource.NetMsgFrame)frames_arr[0].Value;
+            var prev_frame = (GoldSource.NetMsgFrame)frames_arr[1].Value;
 
-                if (current_frame.RParms.Onground == 1)
-                {
-                    FOG = Math.Min(++FOG, 50);
-                }
-                else FOG = 0;
+            var current_onground = (current_frame.RParms.Onground == 1);
 
 
-                Check_BhopHack_Type1(prev_frame, current_frame);
-            }
+            current_frame_time = frames_arr[0].Key.Time;
+
+
+            Check_BhopHack_Type1(prev_frame, current_frame);
+            CalculateFOG((current_frame.RParms.Onground == 1));             
         }
+
+        private int jump_count;
 
         private void Check_BhopHack_Type1(GoldSource.NetMsgFrame prev_frame, GoldSource.NetMsgFrame current_frame)
         {
@@ -79,19 +83,60 @@ namespace DemoCheck.Analyzer
             var current_onground = current_frame.RParms.Onground == 1;
 
             var just_in_ground = !prev_onground && current_onground;
+            if (just_in_ground)
+            {
+               PrintWarn($"{Name} => just_in_ground. FOG: {FOG}", ConsoleColor.Cyan);
+            }
+
             var just_in_air = prev_onground && !current_onground;
+            if (just_in_air)
+            {
+                PrintWarn($"{Name} => just_in_air. FOG: {FOG}, jump_count:{++jump_count}", ConsoleColor.Cyan);
+            }
 
-            var just_jumped = !prev_jumped && current_jumped;
-            var just_notjumped = prev_jumped && !current_jumped;
+            var just_jump_keypressed = !prev_jumped && current_jumped;
+            if(just_jump_keypressed)
+            {
+                //PrintWarn($"{Name} => just_jump_keypressed. FOG: {FOG}", ConsoleColor.Cyan);
+            }
+            var just_jump_unkeypressed = prev_jumped && !current_jumped;
 
-            if (prev_onground && just_jumped) Console.WriteLine($"JustJumped: FOG:{FOG}");
+            //if (just_in_air && just_jump_unkeypressed)
+              //  PrintWarn($"{Name} => Bhop Warn Type #1");
 
+            if (just_in_ground && just_jump_keypressed)
+                PrintWarn($"{Name} => Bhop Warn Type #2 (FOG:{FOG}, jump_count:{jump_count})");
+        }
 
-            if (just_in_air && just_notjumped)
-                Console.WriteLine($"{Name} => Bhop Warn Type #1");
+        private void Check_FOG()
+        {
+            if (prev_FOG != 0 && prev_FOG == FOG)
+                PrintWarn($"{Name} => Bhop Warn Type #3");
+        }
 
-            if (just_in_ground && just_jumped)
-                Console.WriteLine($"{Name} => Bhop Warn Type #2");
+        // Frames on ground before Jump (or Duck)
+        private int FOG;
+        private int prev_FOG;
+        private void CalculateFOG(bool OnGround)
+        {
+            const int MAX_FOG_FRAMES = 50;
+            if (OnGround)
+            {
+                FOG = Math.Min(++FOG, MAX_FOG_FRAMES);
+            }
+            else
+            {
+                Check_FOG();
+                prev_FOG = FOG;
+                FOG = 0;
+            }
+        }
+
+        private void PrintWarn(string buffer, ConsoleColor color = ConsoleColor.Red)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine(buffer + $"\t\t(Time: {current_frame_time})");
+            Console.ForegroundColor = ConsoleColor.White;
         }
     }
 }
