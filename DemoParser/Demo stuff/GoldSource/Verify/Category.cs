@@ -5,14 +5,14 @@ namespace DemoParser.Demo_stuff.GoldSource.Verify
 {
     public class Category
     {
+        public List<Tuple<string, Commandtype>> CommandRules;
+        public List<Tuple<string, string>> CvarRules;
         public string name;
-        public List<Tuple<String,Commandtype>> CommandRules;
-        public List<Cvar> CvarRules;
 
         public Category()
         {
             CommandRules = new List<Tuple<string, Commandtype>>();
-            CvarRules = new List<Cvar>();
+            CvarRules = new List<Tuple<string, string>>();
         }
     }
 }
